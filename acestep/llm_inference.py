@@ -308,6 +308,10 @@ class LLMHandler:
     
     def _load_pytorch_model(self, model_path: str, device: str) -> Tuple[bool, str]:
         """Load PyTorch model from path and return (success, status_message)"""
+        # Save params for reload
+        self._llm_model_path = model_path
+        self._llm_device = device
+        
         try:
             # When using device_map="auto", don't specify device parameter - let Accelerate handle it
             self.llm = AutoModelForCausalLM.from_pretrained(
@@ -442,6 +446,41 @@ class LLMHandler:
         else:
             return [formatted_prompts], is_batch
     
+    def unload_model(self):
+        """Unload LLM model to free GPU memory"""
+        if self.llm is not None:
+            logger.info("Unloading LLM model to free memory...")
+            del self.llm
+            self.llm = None
+            self.llm_initialized = False
+            import gc
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            logger.info("LLM model unloaded")
+            
+    def reload_model(self) -> bool:
+        """Reload LLM model if it was unloaded"""
+        if self.llm_initialized and self.llm is not None:
+            return True
+            
+        if self._llm_model_path is None:
+            logger.warning("Cannot reload LLM: No previous model path saved")
+            return False
+            
+        logger.info(f"Reloading LLM model from {self._llm_model_path}...")
+        success, msg = self._load_pytorch_model(self._llm_model_path, self._llm_device)
+        if success:
+            logger.info("LLM model reloaded successfully")
+        else:
+            logger.error(f"Failed to reload LLM model: {msg}")
+        return success
+
+    @property
+    def is_reloadable(self) -> bool:
+        """Check if model can be reloaded"""
+        return self._llm_model_path is not None
+
     def initialize(
         self,
         checkpoint_dir: str,
@@ -878,6 +917,15 @@ class LLMHandler:
             generated_ids = generated_ids.cpu()
         
         output_text = self.llm_tokenizer.decode(generated_ids, skip_special_tokens=False)
+        
+        # Aggressive memory cleanup
+        del generated_ids
+        if 'inputs' in locals(): del inputs
+        if 'batch_inputs_tokenized' in locals(): del batch_inputs_tokenized
+        if 'batch_input_ids' in locals(): del batch_input_ids
+        if 'outputs' in locals(): del outputs
+        torch.cuda.empty_cache()
+        
         return output_text
 
     def _run_pt(
@@ -2492,32 +2540,39 @@ class LLMHandler:
     @contextmanager
     def _load_model_context(self):
         """
-        Context manager to load a model to GPU and offload it back to CPU after use.
-        Only used for PyTorch backend when offload_to_cpu is True.
+        Context manager to ensure model is on GPU during inference and offloaded if needed.
+        Handles both manual offloading and device_map='auto'.
         """
-        if not self.offload_to_cpu:
-            yield
-            return
-        
-        # If using nanovllm, do not offload (it stays on GPU)
+        # 1. If using nanovllm, do not offload (it stays on GPU)
         if self.llm_backend == "vllm":
             yield
             return
-        
+
         model = self.llm
         if model is None:
             yield
             return
+
+        # 2. If model uses device_map="auto" (Accelerate), do not manually move it.
+        # Accelerate handles offloading automatically.
+        if hasattr(model, "hf_device_map") and model.hf_device_map:
+            yield
+            return
+
+        # 3. If manual offloading is disabled, assuming model is already on device
+        if not self.offload_to_cpu:
+            yield
+            return
         
-        # Load to GPU
+        # 4. Manual offloading: Move to GPU, then back to CPU
         logger.info(f"Loading LLM to {self.device}")
         start_time = time.time()
-        if hasattr(model, "to"):
-            model.to(self.device).to(self.dtype)
-        load_time = time.time() - start_time
-        logger.info(f"Loaded LLM to {self.device} in {load_time:.4f}s")
-
         try:
+            if hasattr(model, "to"):
+                 model.to(self.device).to(self.dtype)
+            load_time = time.time() - start_time
+            logger.info(f"Loaded LLM to {self.device} in {load_time:.4f}s")
+            
             yield
         finally:
             # Offload to CPU

@@ -143,7 +143,7 @@ def load_metadata(file_obj, llm_handler=None):
         else:
             audio_duration = -1
         
-        batch_size = metadata.get('batch_size', 2)
+        batch_size = metadata.get('batch_size', 1)
         inference_steps = metadata.get('inference_steps', 8)
         guidance_scale = metadata.get('guidance_scale', 7.0)
         seed = metadata.get('seed', '-1')

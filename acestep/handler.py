@@ -75,7 +75,7 @@ class AceStepHandler:
         self.reward_model = None
         
         # Batch size
-        self.batch_size = 2
+        self.batch_size = 1
         
         # Custom layers config
         self.custom_layers_config = {2: [6], 3: [10, 11], 4: [3], 5: [8, 9], 6: [8]}
@@ -672,6 +672,14 @@ class AceStepHandler:
 
         model = getattr(self, model_name, None)
         if model is None:
+            yield
+            return
+
+        # If model uses device_map="auto" (Accelerate), do not manually move it.
+        if hasattr(model, "hf_device_map") and model.hf_device_map:
+            # Still ensure silence_latent and other ancillary tensors are on device if needed
+            if model_name == "model" and hasattr(self, "silence_latent"):
+                 self.silence_latent = self.silence_latent.to(self.device).to(self.dtype)
             yield
             return
 
@@ -2946,8 +2954,10 @@ class AceStepHandler:
                     del pred_latents_for_decode
                     
                     # Cast output to float32 for audio processing/saving (in-place if possible)
-                    if pred_wavs.dtype != torch.float32:
-                        pred_wavs = pred_wavs.float()
+                    # Optimization: Skip GPU float32 conversion to save VRAM.
+                    # Conversion happens later during CPU transfer (pred_wavs[i].cpu().float())
+                    # if pred_wavs.dtype != torch.float32:
+                    #     pred_wavs = pred_wavs.float()
                     
                     torch.cuda.empty_cache()
             end_time = time.time()
