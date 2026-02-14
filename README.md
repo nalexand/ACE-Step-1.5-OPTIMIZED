@@ -9,6 +9,8 @@ python musicbox_v1.py
 ### use v2 it better but slower, but here also Gemini creates better result, more what you want
 python musicbox_v1.py
 
+### Demo: https://youtu.be/QZ74d8PWUK0
+
 
 
 <h2 align="center">ACE-Step 1.5</h2>
