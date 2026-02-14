@@ -1,5 +1,6 @@
 <h1 align="center">ACE-Step 1.5 - Music Box UI</h1>
-![Still 2026-02-14 095454_1 2 1](https://github.com/user-attachments/assets/87933df9-faad-4e89-9974-0485f3b0f308)
+<img src="./assets/img1.jpg" width="100%" alt="Music Box UI">
+
 <p>Just select genre describe what you want to hear and push play btn. Unlimited playlist will be generated while you listening first song next generated so it never ends until you stop it :)</p>
 
 <h2 align="center">ACE-Step 1.5</h2>
