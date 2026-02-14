@@ -1,5 +1,9 @@
-<h1 align="center">ACE-Step 1.5</h1>
-<h1 align="center">Pushing the Boundaries of Open-Source Music Generation</h1>
+<h1 align="center">ACE-Step 1.5 - Music Box UI</h1>
+![Still 2026-02-14 095454_1 2 1](https://github.com/user-attachments/assets/87933df9-faad-4e89-9974-0485f3b0f308)
+<p>Just select genre describe what you want to hear and push play btn. Unlimited playlist will be generated while you listening first song next generated so it never ends until you stop it :)</p>
+
+<h2 align="center">ACE-Step 1.5</h2>
+<h2 align="center">Pushing the Boundaries of Open-Source Music Generation</h2>
 <p align="center">
     <a href="https://ace-step.github.io/ace-step-v1.5.github.io/">Project</a> |
     <a href="https://huggingface.co/ACE-Step/Ace-Step1.5">Hugging Face</a> |
