@@ -3,10 +3,10 @@
 
 <p>Just select genre describe what you want to hear and push play btn. Unlimited playlist will be generated while you listening first song next generated so it never ends until you stop it :)</p>
 
-### use v1 it faster and best with Gemini api key
+### Use v1 it is faster and best with Gemini api key
 python musicbox_v1.py
 
-### use v2 it better but slower, but here also Gemini creates better result, more what you want
+### Use v2 it is better but slower, and here also Gemini creates better result, more what you ask
 python musicbox_v1.py
 
 ### Demo: https://youtu.be/QZ74d8PWUK0
