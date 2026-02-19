@@ -17,6 +17,15 @@ python musicbox_v1.py
 ```python
 python improve_audio3.py
 ```
+* Original:
+<audio src="./assets/before_master.flac" controls>
+  Your browser does not support the audio element.
+</audio>
+
+* Mastered:
+<audio src="./assets/surgical_master.flac" controls>
+  Your browser does not support the audio element.
+</audio>
 
 
 
