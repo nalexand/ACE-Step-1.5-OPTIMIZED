@@ -11,6 +11,14 @@ python musicbox_v1.py
 
 ### Demo: https://youtu.be/QZ74d8PWUK0
 
+<h2 align="center">AI Music Distortion filter - Mastering Tool</h1>
+<img src="./assets/img2.jpg" width="100%" alt="AI music Distortion filter">
+
+```python
+python improve_audio3.py
+```
+
+
 
 
 <h2 align="center">ACE-Step 1.5</h2>
