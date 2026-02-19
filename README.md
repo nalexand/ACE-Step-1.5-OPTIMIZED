@@ -17,12 +17,6 @@ python musicbox_v1.py
 ```python
 python improve_audio3.py
 ```
-* Original: <video controls src="./assets/before_master.flac" title="Before master Audio" width="400"></video>
-* [![Play](https://img.shields.io/badge/▶_Play-Original-gray?style=for-the-badge)](./assets/before_master.flac)
-
-
-* Mastered:
-* [![Play](https://img.shields.io/badge/▶_Play-Mastered-gray?style=for-the-badge)](./assets/surgical_master.flac)
 
 
 
